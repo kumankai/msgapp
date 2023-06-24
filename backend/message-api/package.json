@@ -1,0 +1,15 @@
+{
+  "name": "message-api",
+  "version": "1.0.0",
+  "description": "For handling messages",
+  "main": "message.js",
+  "scripts": {
+    "start": "node src/message.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jacob",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
