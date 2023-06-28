@@ -3,6 +3,19 @@ const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT || 8080;
 
+///////// MONGODB //////////
+
+const uri = 'mongodb+srv://jangga:aW1S3rayPUzxJCJU@cluster0.ge9dtvn.mongodb.net/?retryWrites=true&w=majority';
+
+async function mdbconnect() {
+    try {
+        await mongoose.connect(uri);
+        console.log("Connected to MongoDB");
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 ///////// POSTGRES //////////
 
 const {Client} = require('pg');
@@ -33,10 +46,11 @@ app.get('/', (req, res) =>
 ////////////////////////////
 
 try {
-pgconnect();
-app.listen(port, () =>
-    console.log(`Message API listening on port ${port}`)
-);
+    mdbconnect();
+    pgconnect();
+    app.listen(port, () =>
+        console.log(`Message API listening on port ${port}`)
+    );
 } catch (err) {
     console.error(err);
 }
