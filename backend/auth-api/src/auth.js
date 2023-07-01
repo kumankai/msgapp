@@ -32,7 +32,7 @@ const PG = new Client({
 async function pgconnect() {
     try {
         await PG.connect();
-        console.log("Connected to Postgres post:5432");
+        console.log("Connected to Postgres port:5432");
     } catch (err) {
         console.error(err);
     }
