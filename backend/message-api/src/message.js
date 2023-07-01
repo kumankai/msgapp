@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
@@ -5,7 +6,7 @@ const port = process.env.PORT || 8080;
 
 ///////// MONGODB //////////
 
-const uri = 'mongodb+srv://jangga:aW1S3rayPUzxJCJU@cluster0.ge9dtvn.mongodb.net/?retryWrites=true&w=majority';
+const uri = process.env.URI;
 
 async function mdbconnect() {
     try {
@@ -21,17 +22,17 @@ async function mdbconnect() {
 const {Client} = require('pg');
 
 const PG = new Client({
-    host: "localhost",
-    user: "postgres",
-    port: 5432,
-    password: "rootUser",
-    database: "msgapp"
+    host: process.env.PG_ENDPOINT,
+    user: process.env.PG_USER,
+    port: process.env.PG_PORT,
+    password: process.env.PG_PASS,
+    database: process.env.PG_DB
 })
 
 async function pgconnect() {
     try {
         await PG.connect();
-        console.log("Connected to Postgres post:5432");
+        console.log("Connected to Postgres port:5432");
     } catch (err) {
         console.error(err);
     }
