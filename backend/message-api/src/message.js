@@ -40,18 +40,6 @@ async function pgconnect() {
 
 ////////////////////////////
 
-app.get('/', (req, res) => 
-    res.json({message: 'Docker is easy' })
-);
-
-PG.query('SELECT * FROM USERS', (err, res) => {
-    try{
-        console.log(res);
-    }
-    catch (err) {
-        console.error(err);
-    }
-});
 
 ////////////////////////////
 
