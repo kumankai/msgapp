@@ -41,14 +41,15 @@ async function pgconnect() {
 ////////////////////////////
 
 
+
 ////////////////////////////
 
 try {
     mdbconnect();
     pgconnect();
-    app.listen(port, () =>
+    app.listen(port, () => {
         console.log(`Message API listening on port ${port}`)
-    );
+    });
 } catch (err) {
     console.error(err);
 }

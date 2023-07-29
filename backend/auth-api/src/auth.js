@@ -42,7 +42,6 @@ async function pgconnect() {
 
 
 
-
 ////////////////////////////
 
 try{
