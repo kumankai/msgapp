@@ -1,5 +1,7 @@
 require("dotenv").config();
 const express = require('express');
+const authRoutes = require('../routes/auth-routes');
+const { throwError } = require('../helpers/error');
 const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT;
@@ -8,7 +10,7 @@ const port = process.env.PORT;
 
 const uri = process.env.URI;
 
-async function mdbconnect() {
+const mdbconnect = async () => {
     try {
         await mongoose.connect(uri);
         console.log("Connected to MongoDB");
@@ -29,7 +31,7 @@ const PG = new Client({
     database: process.env.PG_DB
 })
 
-async function pgconnect() {
+const pgconnect = async () => {
     try {
         await PG.connect();
         console.log(`Connected to Postgres port:${process.env.PG_PORT}`);
@@ -40,7 +42,30 @@ async function pgconnect() {
 
 ////////////////////////////
 
+app.use(express.json());
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+  
+app.use(authRoutes);
+  
+app.use((err, req, res, next) => {
+    console.log(err);
+    let code = 500;
+    let message = 'Something went wrong.';
+    if (err.code) {
+        code = err.code;
+    }
+
+    if (err.message) {
+        message = err.message;
+    }
+    res.status(code).json({ message: message });
+});
 
 ////////////////////////////
 

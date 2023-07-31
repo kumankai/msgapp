@@ -1,0 +1,15 @@
+POST http://localhost:5002/token
+Content-Type: application/json
+
+{
+    "username": "Jacob"
+}
+
+###
+
+POST http://localhost:5002/verify-token
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSmFjb2IiLCJpYXQiOjE2OTA3Njc1NzYsImV4cCI6MTY5MDc2NzU5MX0.IWKOdrjttlCh_xj195ULkytSi3Tg9UyBso3SzBXC5Z4"
+}
