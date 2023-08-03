@@ -44,9 +44,11 @@ const pgconnect = async () => {
 
 app.use(express.json());
 
+
+//Main middleware
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS,DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     next();
 });

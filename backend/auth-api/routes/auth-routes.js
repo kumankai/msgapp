@@ -8,4 +8,6 @@ router.post('/token', authActions.getToken);
 
 router.post('/verify-token', authActions.verifyToken);
 
+router.post('/regenerate-token', authActions.regenerateToken);
+
 module.exports = router;

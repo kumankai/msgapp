@@ -6,10 +6,17 @@ Content-Type: application/json
 }
 
 ###
-
 POST http://localhost:5002/verify-token
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSmFjb2IiLCJpYXQiOjE2OTA3Njc1NzYsImV4cCI6MTY5MDc2NzU5MX0.IWKOdrjttlCh_xj195ULkytSi3Tg9UyBso3SzBXC5Z4"
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSmFjb2IiLCJpYXQiOjE2OTA4NjI1NjksImV4cCI6MTY5MDg2MjU4NH0.0SuWID9BqDLIc30MW3YuTRPxUjjbTmtQQFs3wv3EJ-w"
+}
+
+###
+POST http://localhost:5002/regenerate-token
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSmFjb2IiLCJpYXQiOjE2OTA4NjI1NDZ9.1vubug0zkKJ1gUFSgpFCrK7YER3MrX1M_kMCYjeTdm0"
 }
