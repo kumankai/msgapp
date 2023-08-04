@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  courier:
+    container_name: courier
+    image: jangga/courier:latest
+    ports:
+      - "3000:3000" # Expose the courier API on host port 3000
+    depends_on:
+      - postgres
+    networks:
+      - backend-network
+
+  users:
+    container_name: users
+    image: jangga/users:latest
+    ports:
+      - "3001:3000" # Expose the users API on host port 3002
+    depends_on:
+      - postgres
+    networks:
+      - backend-network
+
+  security:
+    container_name: security
+    image: jangga/security:latest
+    ports:
+      - "3002:3000"
+    depends_on:
+      - postgres
+    networks:
+      - backend-network
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: janggaco
+      POSTGRES_DB: msgapp
+    ports:
+      - "5432:5432" # Expose PostgreSQL on host port 5432
+    networks:
+      - backend-network
+
+volumes:
+  postgres_data:
+
+networks:
+  backend-network:
