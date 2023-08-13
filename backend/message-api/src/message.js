@@ -11,7 +11,7 @@ const httpServer = createServer(app);
 
 const uri = process.env.URI;
 
-async function mdbconnect() {
+const mdbconnect = async () => {
     try {
         await mongoose.connect(uri);
         console.log("Connected to MongoDB");
@@ -22,24 +22,7 @@ async function mdbconnect() {
 
 ///////// POSTGRES //////////
 
-const {Client} = require('pg');
 
-const PG = new Client({
-    host: process.env.PG_ENDPOINT,
-    user: process.env.PG_USER,
-    port: process.env.PG_PORT,
-    password: process.env.PG_PASS,
-    database: process.env.PG_DB
-})
-
-async function pgconnect() {
-    try {
-        await PG.connect();
-        console.log(`Connected to Postgres port:${process.env.PG_PORT}`);
-    } catch (err) {
-        console.error(err);
-    }
-}
 
 ////////////////////////////
 

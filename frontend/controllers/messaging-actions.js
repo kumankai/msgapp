@@ -3,7 +3,9 @@
 // ---------------------------
 // Contains functions related to message handling
 
-import io from 'socker.io-client';
+const io = require('socket.io-client');
+
+const socket = io.connect('http://localhost:5000');
 
 const joinRoom = (room) => {
     if (room != "") {
@@ -11,8 +13,8 @@ const joinRoom = (room) => {
     };
 };
 
-const sendMessage = (message, room, userid) => {
-    Socket.emit("message", { message, room, userid });
+const sendMessage = (username, timestamp, message, room) => {
+    socket.emit("message", { username, timestamp, message, room});
 };
 
-export default { joinRoom, sendMessage, };
+module.exports = { joinRoom, sendMessage };

@@ -1,22 +1,18 @@
-POST http://localhost:5002/token
+POST http://localhost:5002/login
 Content-Type: application/json
 
 {
-    "username": "Jacob"
+    "registering": "false",
+    "username": "Jacob",
+    "password": "bruh"
 }
 
 ###
-POST http://localhost:5002/verify-token
+
+POST http://localhost:5002/signup
 Content-Type: application/json
 
 {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSmFjb2IiLCJpYXQiOjE2OTA4NjI1NjksImV4cCI6MTY5MDg2MjU4NH0.0SuWID9BqDLIc30MW3YuTRPxUjjbTmtQQFs3wv3EJ-w"
-}
-
-###
-POST http://localhost:5002/regenerate-token
-Content-Type: application/json
-
-{
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSmFjb2IiLCJpYXQiOjE2OTA4NjI1NDZ9.1vubug0zkKJ1gUFSgpFCrK7YER3MrX1M_kMCYjeTdm0"
+    "username": "Jacob",
+    "password": "bruh"
 }

@@ -4,9 +4,11 @@ const authActions = require('../controllers/auth-actions');
 
 const router = express.Router();
 
-router.post('/token', authActions.getToken);
+router.post('/signup', authActions.signup);
 
-router.post('/verify-token', authActions.verifyToken);
+router.post('/login', authActions.login);
+
+router.post('logout', authActions.logout);
 
 router.post('/regenerate-token', authActions.regenerateToken);
 

@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require('express');
 const authRoutes = require('../routes/auth-routes');
-const { throwError } = require('../helpers/error');
 const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT;
@@ -54,8 +53,6 @@ app.use((req, res, next) => {
 });
   
 app.use(authRoutes);
-
-//Hello world
   
 app.use((err, req, res, next) => {
     console.log(err);
@@ -74,8 +71,8 @@ app.use((err, req, res, next) => {
 ////////////////////////////
 
 try{
-    mdbconnect();
-    pgconnect();
+    //mdbconnect();
+    //pgconnect();
     app.listen(port, () =>  {
         console.log(`Auth API listening on port ${port}`);
     });
