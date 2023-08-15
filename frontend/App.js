@@ -1,7 +1,8 @@
 
 import { StyleSheet, View } from 'react-native';
 import LoginPage from '@pages/LoginPage';
-import SignupPage from '@pages/SignupPage'
+import SignupPage from '@pages/SignupPage';
+import ActionPage from '@pages/ActionPage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -17,6 +18,9 @@ export default function App() {
         <Stack.Screen 
           name='SignUp'
           component={SignupPage}/>
+        <Stack.Screen 
+          name='Actions'
+          component={ActionPage}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
