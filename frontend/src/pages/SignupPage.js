@@ -36,7 +36,7 @@ export default function LoginPage({ navigation }){
                             value={vpass} onChangeText={text => setVPass(text)}/>
                         {password != vpass  && <Text style={[styles.inputInfoText, {color: "red", opacity: 1}]}>{"\u2022"} mis-matched passwords</Text>}
                     </View>
-                    <Pressable style={styles.signupBtn}>
+                    <Pressable style={styles.signupBtn} onPress={() => navigation.navigate('Actions')}>
                         <Text style={styles.signupBtnTxt}>Sign Up</Text>
                     </Pressable>
                 </View>
