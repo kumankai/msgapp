@@ -1,4 +1,15 @@
 const mongoose = require('mongoose');
+const { throwError } = require('../helpers/error');
+const uri = process.env.URI;
+
+const mdbconnect = async () => {
+    try {
+        await mongoose.connect(uri);
+        console.log("Connected to MongoDB");
+    } catch (err) {
+        throwError(err, 500);
+    }
+}
 
 const saveRefreshToken = async (username, refreshToken) => {
 
@@ -12,4 +23,4 @@ const deleteRefreshToken = async (username) => {
 
 }
 
-module.exports = { saveRefreshToken, getRefreshToken, deleteRefreshToken };
+module.exports = { mdbconnect, saveRefreshToken, getRefreshToken, deleteRefreshToken };

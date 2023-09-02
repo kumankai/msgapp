@@ -8,11 +8,18 @@ Content-Type: application/json
 }
 
 ###
-
 POST http://localhost:5002/signup
 Content-Type: application/json
 
 {
-    "username": "Jacob",
+    "username": "dfgd",
     "password": "bruh"
+}
+###
+POST http://localhost:5002/logout
+Content-Type: application/json
+
+{
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSmFjb2IiLCJpYXQiOjE2OTM2Mzc1NzgsImV4cCI6MTY5MzYzNzU5M30.CaILIBiGfwJ0fEt1hY-7e9xsxHCKxeI37ucP-BgiKu8",
+    "username": "Jacob"
 }

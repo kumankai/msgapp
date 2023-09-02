@@ -10,7 +10,7 @@ const authpg = require('../data/pg-actions');
 const authmongo = require('../data/mongo-actions');
 
 
-///////////////////// TOKENS /////////////////////
+///////////////////// Helper Functions /////////////////////
 
 /**
  * Generates an accessToken
@@ -47,13 +47,14 @@ const getToken = async (req, res) => {
     res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken });
 };
 
-const verifyToken = async (req, res) => {
-    //Verify accessToken
-    const token = req.body.accessToken;
-
+/**
+ * 
+ * @param {*} token String
+ * @returns {}
+ */
+const verifyToken = (token) => {
     try {
-        jwt.verify(token, process.env.ACCESS_TOKEN);
-        res.status(200).json({});
+        return jwt.verify(token, process.env.ACCESS_TOKEN);
     } catch (err) {
         if (err.name == 'TokenExpiredError') {
             throwError('Token has expired', 401);
@@ -62,45 +63,6 @@ const verifyToken = async (req, res) => {
         };
     };
 };
-
-const remove = () => {
-    //Delete accessToken from PG
-            res.status(204);
-};
-
-///////////////////// PASSWORDS /////////////////////
-
-/**
- * Hashes raw passwords
- * @returns {string} Hashed Password
- */
-const createHashedPassword = async (password) => {
-    const hashedpwd = await bcrypt.hash(password, 12);
-    console.log("Hashed password: " + hashedpwd);
-    return hashedpwd;
-
-    // bcrypt.hash(password,12).then(
-    //     (data) => {
-    //         return data;
-    //     }
-    // ).catch(
-    //     (err) => {
-    //         throwError('Failed to secure password', 500)
-    //     }
-    // );
-};
-
-// const getHashedPassword = async (req, res) => {
-//     //Retrieves hashed password
-//     const rawpwd = req.body.password;
-
-//     try {
-//         const hashedpwd = createHashPassword(rawpwd);
-//         res.status(200).json({ hash: hashedpwd });
-//     } catch (err) {
-//         next(err);
-//     };
-// };
 
 const verifyPassword = async (rawpwd, hashedpwd) => {
     //Verifies password
@@ -117,17 +79,32 @@ const signup = async (req, res) => {
     const username = req.body.username;
     const rawpwd = req.body.password;
 
+    const data = {
+        registering: "true",
+        username: username,
+        password: rawpwd
+    };
+
     try{
         //Hash password
         const hashedpwd = await bcrypt.hash(rawpwd, 12);
 
+        //Save account
         authpg.saveAccount(username, hashedpwd);
-        //Call login function
-        return res.sendStatus(200);
+
+        //Call login
+        fetch('http://localhost:5002/login', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+       });
     }
     catch (err) {
+        authpg.deleteUser(username);
         throwError("Failed to register user", 500);    
-    }
+    };
 };
 
 const login = async (req, res, next) => {
@@ -139,29 +116,42 @@ const login = async (req, res, next) => {
     const rawpassword = req.body.password;
     const user = { name: username };
 
-    //Tokens
-    const accessToken = createAccessToken(user);
-    const refreshToken = createRefreshToken(user);
-
     try {
-        //Store tokens to DB
-        await authpg.saveAccessToken(username, accessToken);
-        authmongo.saveRefreshToken(username, refreshToken);
+        //Create tokens
+        const accessToken = createAccessToken(user);
+        const refreshToken = createRefreshToken(user);
 
-        if (registering == true) {
+        if (registering == "true") {
             //Login from Sign Up
-            return res.send(200).json({ accessToken: accessToken });
-        } else {
-            const hashedpwd = await authpg.getHashedPassword(username);
-            
-            // const valid = verifyPassword(rawpassword, hashedpwd);
+            //Store tokens to DB
+            authpg.saveAccessToken(username, accessToken);
+            authmongo.saveRefreshToken(username, refreshToken);
+            console.log("Test");
+            return res.status(200).json({ accessToken: accessToken });
+        }; 
 
-            // if (valid == true) {
-            //     res.status(200).json({ accessToken: accessToken });
-            // } else {
-            //     res.status(401).json({ message: "Invalid credentials" });
-            // };
-        };
+        //Verifies username
+        authpg.findUser(username)
+        .then((result) => {
+            if (result == false) {
+                return res.status(401).json({ message: "Credentials do not match" });
+            }
+        })
+        .catch((err) => { return throwError(err, 500); });
+
+        //Verifies password
+        authpg.verifyPassword(username, rawpassword)
+        .then((result) => {
+            console.log(result);
+            if (result === false) {
+                console.log(result);
+                return res.status(401).json({ message: "Credentials do not match" });
+            }
+            else {
+                return res.status(200).json({ accessToken: accessToken });
+            }
+        })
+        .catch((err) => { return throwError(err, 500); });
     }
     catch (err) {
         next(err);
@@ -169,17 +159,21 @@ const login = async (req, res, next) => {
 };
 
 const logout = async (req, res) => {
+    const accessToken = req.body.accessToken;
     const username = req.body.username;
 
     try {
+        //Verify access token
+        verifyToken(accessToken);
+
         //Delete tokens
         authmongo.deleteRefreshToken(username);
         authpg.deleteAccessToken(username);
 
         return res.sendStatus(200);
     } catch (err) {
-        throwError("Failed to logout", 500);
-    }
+        next(err);
+    };
 };
 
 const regenerateToken = async (req, res) => {
@@ -188,12 +182,15 @@ const regenerateToken = async (req, res) => {
     const refreshToken = authmongo.getRefreshToken();
     
     if (refreshToken == null) return res.sendStatus(401);
+    
     //Code for checking refreshToken authenticity
-
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, user) => {
-        if (err) {
+        if (err) { //If refreshToken is invalid
+            //Delete tokens (logout)
+            authmongo.deleteRefreshToken(username);
+            authpg.deleteAccessToken(username);
+
             res.sendStatus(403);
-            //Call logout;
         };
 
         const accessToken = createAccessToken({ name: user.name });

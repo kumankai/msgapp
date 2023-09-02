@@ -4,6 +4,7 @@
 require("dotenv").config();
 const { Client } = require('pg');
 const { throwError } = require('../helpers/error');
+const bcrypt = require('bcrypt');
 
 const PG = new Client({
     host: 'localhost', //process.env.PG_ENDPOINT,
@@ -24,72 +25,113 @@ const pgconnect = async () => {
 
 const pgdisconnect = async () => {
     await PG.end();
-    console.log('Postgres connection ended');
+    console.log('Postgres successfully disconnected');
 };
 
 /////////////////////////
 
-const getHashedPassword = async (username) => {
-    await pgconnect();
+const findUser = async (username) => {
+    return new Promise((resolve, reject) => {
+        try {
+            PG.query(`SELECT * FROM USERS WHERE USERNAME='${username}'`, (err, result) => {
+                if (err) reject(err);
+    
+                if (result.rowCount == 0) {
+                    resolve(false);
+                    return;
+                }
 
-    PG.query(`SELECT PASSWORD FROM USERS WHERE USERNAME='${username}'`, (err,result) => {
-        if (err) throwError(err, 500);
-        console.log(result);
-
-        pgdisconnect();
-        return result;
-    });
-
+                resolve(true);
+                return;
+            });
+        } catch (err) {
+            reject(err);
+            return;
+        }
+    })
 };
 
-const saveAccount = async (username, password) => {
-    pgconnect();
+const verifyPassword = async (username, rawpwd) => {
+    return new Promise((resolve, reject) => {
+        try {
+            PG.query(`SELECT PASSWORD FROM USERS WHERE USERNAME='${username}'`, (err, result) => {
+                if (err) reject(err);
 
+                const hashedpwd = result.rows[0].password;
+                bcrypt.compare(rawpwd, hashedpwd, (err, result) => {
+                    if (err) {
+                        reject();
+                        return;
+                    }
+
+                    resolve(result);
+                    return;
+                });
+            });
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+const saveAccount = async (username, password) => {
+    //Save user in database
     try{
         PG.query(`INSERT INTO USERS(USERNAME, PASSWORD) VALUES ('${username}', '${password}')`, (err) => {
             if (err) {
-                pgdisconnect();
                 throwError(err, 400); //PG could not query
             }
             console.log("Account successfully saved");
-            pgdisconnect();
             return;
         });
         
     } catch (err) {
-        pgdisconnect();
         throwError("Failed to register user", 500);
     };
 };
 
 const saveAccessToken = async (username, accessToken) => {
-    await pgconnect();
-
+    //Save user's accesstoken in database
     try{
         PG.query(`UPDATE USERS SET ACCESSTOKEN='${accessToken}' WHERE USERNAME='${username}'`, (err) => {
             if (err) throwError(err, 500);
         });
-        console.log("Token bas been saved");
-        await pgdisconnect();
+        console.log("Token successfully saved");
     } catch (err) {
         throwError("Failed to save accessToken", 500);
     };
 };
 
-const deleteAccessToken = (username) => {
+const deleteAccessToken = async (username) => {
+    //Delete accesstoken in database
     try{
-        pgconnect();
-
-        PG.query(`DELETE ACCESSTOKEN FROM USERS WHERE USERNAME='${username}'`);
-
-        PG.end();
+        PG.query(`DELETE ACCESSTOKEN FROM USERS WHERE USERNAME='${username}'`, (err) => {
+            if (err) throwError(err, 500);
+        });
+        console.log("Token successfully deleted");
     } catch (err) {
         throwError("Failed to delete accessToken", 500);
-    }
-}
+    };
+};
+
+const deleteUser = async (username) => {
+    //Delete user from database
+    try{
+        PG.query(`DELETE FROM USERS WHERE USERNAME='${username}'`, (err) => {
+            if (err) throwError(err, 500);
+        });
+        console.log("User successfully deleted");
+    } catch (err) {
+        throwError("Failed to delete user", 500);
+    };
+};
 
 module.exports = {
-    getHashedPassword,
+    pgconnect,
+    findUser,
+    verifyPassword,
     saveAccount,
     saveAccessToken,
-    deleteAccessToken, };
+    deleteAccessToken,
+    deleteUser,
+};
